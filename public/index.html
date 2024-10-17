@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatguru V2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #00c3ff;
+            --bg-color: #020b1a;
+            --text-color: #a0e4ff;
+            --container-bg: rgba(4, 32, 55, 0.8);
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --button-hover: #00a0cc;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(6, 124, 250, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(6, 124, 250, 0.1) 0%, transparent 20%);
+            background-attachment: fixed;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background-color: var(--container-bg);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 0 30px rgba(0, 195, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--primary-color);
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 195, 255, 0.3);
+        }
+        .form-toggle, .forgot-password {
+            margin-top: 15px;
+            color: var(--text-color);
+            cursor: pointer;
+            text-align: center;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        .form-toggle:hover, .forgot-password:hover {
+            color: var(--primary-color);
+        }
+        #profile-picture-form {
+            text-align: center;
+        }
+        #profile-picture-form h2 {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            color: var(--primary-color);
+        }
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .file-input-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .file-input-wrapper .btn {
+            display: inline-block;
+            padding: 8px 20px;
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .file-input-wrapper:hover .btn {
+            background-color: var(--button-hover);
+        }
+        .file-name {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to {transform: rotate(360deg);}
+        }
+        
+        .image-preview-container {
+            width: 200px;
+            margin: 20px auto;
+            position: relative;
+            display: none;
+        }
+        
+        .image-preview-wrapper {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        
+        .image-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .delete-preview {
+            position: absolute;
+            top: -20px;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-preview:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .delete-preview i {
+            color: #ff4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chatguru V2</h1>
+        
+        <div id="signup-form">
+            <div class="form-group">
+                <input type="text" id="signup-name" placeholder="Full Name" required>
+            </div>
+            <div class="form-group">
+                <input type="email" id="signup-email" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="signup-password" placeholder="Password" required>
+            </div>
+            <button onclick="signUp()">Register</button>
+            <p class="form-toggle" onclick="toggleForm('signin')">Already have an account? Log In</p>
+        </div>
+
+        <div id="signin-form" style="display: none;">
+            <div class="form-group">
+                <input type="email" id="signin-email" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="signin-password" placeholder="Password" required>
+            </div>
+            <button onclick="signIn()">Log In</button>
+            <p class="form-toggle" onclick="toggleForm('signup')">Don't have an account? Register</p>
+            <p class="forgot-password" onclick="toggleForm('forgot-password')">Forgot Password?</p>
+        </div>
+
+        <div id="verify-form" style="display: none;">
+            <div class="form-group">
+                <input type="text" id="verification-code" placeholder="Verification Code" required>
+            </div>
+            <button onclick="verifyEmail()">Verify</button>
+        </div>
+
+        <div id="profile-picture-form" style="display: none;">
+            <h2>Add a Profile Picture</h2>
+            <div class="file-input-wrapper">
+                <button class="btn">Choose File</button>
+                <input type="file" id="profile-picture" accept="image/*" onchange="previewImage(this)">
+            </div>
+            <p class="file-name" id="file-name"></p>
+            <div class="image-preview-container" id="image-preview-container">
+                <div class="delete-preview" onclick="deletePreview()">
+                    <i class="fas fa-trash"></i>
+                </div>
+                <div class="image-preview-wrapper">
+                    <img id="image-preview" class="image-preview" src="" alt="Profile picture preview">
+                </div>
+            </div>
+            <div class="button-group">
+                <button onclick="skipProfilePicture()">Skip</button>
+                <button onclick="uploadProfilePicture()">Continue</button>
+            </div>
+            <div class="loading" id="upload-loading"></div>
+        </div>
+
+        <div id="forgot-password-form" style="display: none;">
+            <div class="form-group">
+                <input type="email" id="forgot-password-email" placeholder="Email" required>
+            </div>
+            <button onclick="forgotPassword()">Reset Password</button>
+            <p class="form-toggle" onclick="toggleForm('signin')">Back to Sign In</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleForm(formType) {
+            document.getElementById('signin-form').style.display = formType === 'signin' ? 'block' : 'none';
+            document.getElementById('signup-form').style.display = formType === 'signup' ? 'block' : 'none';
+            document.getElementById('verify-form').style.display = formType === 'verify' ? 'block' : 'none';
+            document.getElementById('profile-picture-form').style.display = formType === 'profile-picture' ? 'block' : 'none';
+            document.getElementById('forgot-password-form').style.display = formType === 'forgot-password' ? 'block' : 'none';
+        }
+
+        function updateFileName(input) {
+            const fileName = input.files[0] ? input.files[0].name : 'No file chosen';
+            document.getElementById('file-name').textContent = fileName;
+        }
+
+        function signUp() {
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const urlParams = new URLSearchParams(window.location.search);
+            const referralCode = urlParams.get('ref');
+            
+            if (!name || !email || !password) {
+                alert('Please fill in all fields.');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            
+            fetch('/auth/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password, referralCode })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Sign up successful! Please check your email for the verification code.');
+                    localStorage.setItem('tempUserId', data.userId);
+                    toggleForm('verify');
+                } else {
+                    alert(data.message || 'Sign up failed. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+
+        function verifyEmail() {
+            const verificationCode = document.getElementById('verification-code').value;
+            const userId = localStorage.getItem('tempUserId');
+            
+            if (!verificationCode) {
+                alert('Please enter the verification code.');
+                return;
+            }
+            
+            fetch('/auth/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, verificationCode })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Email verified successfully. You can now add a profile picture or skip to sign in.');
+                    toggleForm('profile-picture');
+                } else {
+                    alert(data.message || 'Verification failed. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+
+        function uploadProfilePicture() {
+            const pictureInput = document.getElementById('profile-picture');
+            const userId = localStorage.getItem('tempUserId');
+            const loadingIndicator = document.getElementById('upload-loading');
+            
+            if (!pictureInput.files[0]) {
+                alert('Please select a picture to upload.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('picture', pictureInput.files[0]);
+            formData.append('userId', userId);
+
+            loadingIndicator.style.display = 'block';
+
+            fetch('/upload-profile-picture', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                loadingIndicator.style.display = 'none';
+                if (data.success) {
+                    alert('Profile picture uploaded successfully. You will now be logged in.');
+                    autoLogin(userId);
+                } else {
+                    alert(data.message || 'Failed to upload profile picture. Please try again.');
+                }
+            })
+            .catch(error => {
+                loadingIndicator.style.display = 'none';
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+
+        function skipProfilePicture() {
+            const userId = localStorage.getItem('tempUserId');
+            autoLogin(userId);
+        }
+
+        function autoLogin(userId) {
+            console.log('Attempting auto-login for userId:', userId);
+            fetch('/auth/auto-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId })
+            })
+            .then(res => {
+                console.log('Auto-login response status:', res.status);
+                return res.json();
+            })
+            .then(data => {
+                console.log('Auto-login response data:', data);
+                if (data.success) {
+                    localStorage.removeItem('tempUserId');
+                    window.location.href = '/chat';
+                } else {
+                    console.error('Auto-login failed:', data.message);
+                    alert('Failed to log in automatically. Please try signing in manually. Error: ' + data.message);
+                    toggleForm('signin');
+                }
+            })
+            .catch(error => {
+                console.error('Error during auto-login:', error);
+                alert('An error occurred during auto-login. Please try signing in manually. Error: ' + error.message);
+                toggleForm('signin');
+            });
+        }
+
+        function signIn() {
+            const email = document.getElementById('signin-email').value;
+            const password = document.getElementById('signin-password').value;
+            
+            if (!email || !password) {
+                alert('Please fill in all fields.');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            
+            fetch('/auth/signin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/chat';
+                } else {
+                    alert(data.message || 'Sign in failed. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+
+        function forgotPassword() {
+            const email = document.getElementById('forgot-password-email').value;
+            
+            if (!email) {
+                alert('Please enter your email address.');
+                return;
+            }
+            
+            fetch('/auth/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Password reset email sent. Please check your email.');
+                    toggleForm('signin');
+                } else {
+                    alert(data.message || 'Failed to send password reset email. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+
+        function isValidEmail(email) {
+            const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(String(email).toLowerCase());
+        }
+
+        function previewImage(input) {
+            const preview = document.getElementById('image-preview');
+            const previewContainer = document.getElementById('image-preview-container');
+            const file = input.files[0];
+            const reader = new FileReader();
+
+            reader.onloadend = function () {
+                preview.src = reader.result;
+                previewContainer.style.display = 'block';
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+                document.getElementById('file-name').textContent = file.name;
+            } else {
+                deletePreview();
+            }
+        }
+
+        function deletePreview() {
+            const preview = document.getElementById('image-preview');
+            const previewContainer = document.getElementById('image-preview-container');
+            const fileInput = document.getElementById('profile-picture');
+            
+            preview.src = "";
+            previewContainer.style.display = 'none';
+            document.getElementById('file-name').textContent = 'No file chosen';
+            fileInput.value = ''; // Reset file input
+        }
+    </script>
+</body>
+</html>

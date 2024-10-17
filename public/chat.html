@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Nexus Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-container">
+        <div class="grid-overlay"></div>
+        <div class="accent-glow accent-glow-1"></div>
+        <div class="accent-glow accent-glow-2"></div>
+        <div class="wood-grain"></div>
+        <div class="creative-element"></div>
+        <div class="creative-element"></div>
+        <div class="creative-element"></div>
+        <div class="wood-slice"></div>
+        <div class="wood-slice"></div>
+        <div class="wood-slice"></div>
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+    </div>
+    <div class="chat-container">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="chat-header">
+            <div class="chat-title">
+                <h1>Chatguru</h1>
+                <p>Your advanced digital assistant</p>
+            </div>
+            <div id="user-profile" class="user-profile">
+                <div class="profile-header" id="profile-header">
+                    <img id="user-avatar" src="" alt="User Avatar" class="user-avatar">
+                    <span id="user-name-display"></span>
+                    <i class="material-icons">arrow_drop_down</i>
+                </div>
+                <div class="profile-dropdown" id="profile-dropdown">
+                    <div class="profile-info">
+                        <h3>User Profile</h3>
+                        <div class="theme-switch">
+                            <label for="theme-toggle">Switch Theme</label>
+                            <div class="switch">
+                                <input type="checkbox" id="theme-toggle">
+                                <span class="slider"></span>
+                            </div>
+                        </div>
+                        <div class="profile-detail">
+                            <i class="material-icons">person</i>
+                            <p id="profile-name"></p>
+                        </div>
+                        <div class="profile-detail">
+                            <i class="material-icons">email</i>
+                            <p id="profile-email"></p>
+                        </div>
+                        <div class="profile-detail">
+                            <i class="material-icons">stars</i>
+                            <p>Credits: <span id="profile-credits"></span></p>
+                        </div>
+                        
+                        <div class="profile-detail">
+                            <i class="material-icons">link</i>
+                            <p>Your Referral Link: <span id="referral-link"></span></p>
+                        </div>
+                        <button id="copy-referral-link">Copy Link</button>
+                        <div id="referral-claim-section">
+                            <button id="claim-referral" disabled>Claim Now</button>
+                            <p id="referral-status"></p>
+                        </div>
+                        <div class="profile-spacer"></div>
+                        <div class="profile-detail logout-container">
+                            <i class="material-icons">exit_to_app</i>
+                            <p id="logout-button" class="logout-button">Sign Out</p>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="user-info">
+            <p>Credits: <span id="user-credits"></span></p>
+            <button id="get-credits-button">Get More Credits</button>
+        </div>
+        <div id="messages">
+            <!-- AI messages will be added here -->
+        </div>
+        <div class="bottom-container">
+            <button id="new-chat-button">+New Chat</button>
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Type your message...">
+                <div class="action-buttons">
+                    <button class="action-button" id="camera-button"><i class="material-icons">photo_camera</i></button>
+                    <input type="file" id="file-input" accept="image/*" multiple style="display: none;">
+                    <button class="action-button" id="upload-button"><i class="material-icons">attach_file</i></button>
+                    <button class="action-button" id="send-button"><i class="material-icons">send</i></button>
+                </div>
+            </div>
+            <div id="attached-files-preview" class="attached-files-preview"></div>
+            <div class="image-preview" id="image-preview-container" style="display: none;">
+                <img id="image-preview" src="" alt="Preview">
+                <button id="delete-image"><i class="material-icons">delete</i></button>
+            </div>
+        </div>
+    </div>
+    <div id="camera-modal">
+        <div id="camera-container">
+            <video id="camera-feed" autoplay playsinline></video>
+            <div class="camera-controls">
+                <button id="capture-button" class="action-button"><i class="material-icons">camera</i></button>
+                <button id="rotate-camera-button" class="action-button"><i class="material-icons">flip_camera_ios</i></button>
+                <button id="close-camera-button" class="action-button"><i class="material-icons">close</i></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
