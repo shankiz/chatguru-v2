@@ -398,12 +398,50 @@ try {
         }
     }
 
-    document.getElementById('copy-referral-link').addEventListener('click', () => {
+    // Find the existing event listener for the copy button and replace it with this updated version
+    document.getElementById('copy-referral-link').addEventListener('click', async () => {
         const referralLink = document.getElementById('referral-link').textContent;
-        navigator.clipboard.writeText(referralLink)
-            .then(() => alert('Referral link copied to clipboard!'))
-            .catch(err => console.error('Error copying referral link:', err));
+        
+        // Try to use the new Clipboard API
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            try {
+                await navigator.clipboard.writeText(referralLink);
+                alert('Referral link copied to clipboard!');
+            } catch (err) {
+                console.error('Failed to copy using Clipboard API:', err);
+                fallbackCopyTextToClipboard(referralLink);
+            }
+        } else {
+            // Fallback for older browsers or if Clipboard API is not available
+            fallbackCopyTextToClipboard(referralLink);
+        }
     });
+
+    // Add this new function for fallback copy method
+    function fallbackCopyTextToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        
+        // Make the textarea out of viewport
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+            const successful = document.execCommand('copy');
+            const msg = successful ? 'Referral link copied to clipboard!' : 'Unable to copy referral link';
+            alert(msg);
+        } catch (err) {
+            console.error('Fallback: Oops, unable to copy', err);
+            alert('Failed to copy referral link. Please try again or copy it manually.');
+        }
+
+        document.body.removeChild(textArea);
+    }
 
     document.getElementById('claim-referral').addEventListener('click', claimReferralCredits);
 
@@ -552,6 +590,7 @@ try {
                 } catch (error) {
                     console.error('An error occurred in the script:', error);
                 }
+
 
 
 
