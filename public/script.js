@@ -401,24 +401,25 @@ try {
     // Find the existing event listener for the copy button and replace it with this updated version
     document.getElementById('copy-referral-link').addEventListener('click', async () => {
         const referralLink = document.getElementById('referral-link').textContent;
+        const copyButton = document.getElementById('copy-referral-link');
         
         // Try to use the new Clipboard API
         if (navigator.clipboard && navigator.clipboard.writeText) {
             try {
                 await navigator.clipboard.writeText(referralLink);
-                alert('Referral link copied to clipboard!');
+                updateCopyButtonState(copyButton, true);
             } catch (err) {
                 console.error('Failed to copy using Clipboard API:', err);
-                fallbackCopyTextToClipboard(referralLink);
+                fallbackCopyTextToClipboard(referralLink, copyButton);
             }
         } else {
             // Fallback for older browsers or if Clipboard API is not available
-            fallbackCopyTextToClipboard(referralLink);
+            fallbackCopyTextToClipboard(referralLink, copyButton);
         }
     });
 
-    // Add this new function for fallback copy method
-    function fallbackCopyTextToClipboard(text) {
+    // Update this function to handle the button state
+    function fallbackCopyTextToClipboard(text, button) {
         const textArea = document.createElement("textarea");
         textArea.value = text;
         
@@ -433,14 +434,32 @@ try {
 
         try {
             const successful = document.execCommand('copy');
-            const msg = successful ? 'Referral link copied to clipboard!' : 'Unable to copy referral link';
-            alert(msg);
+            updateCopyButtonState(button, successful);
         } catch (err) {
             console.error('Fallback: Oops, unable to copy', err);
-            alert('Failed to copy referral link. Please try again or copy it manually.');
+            updateCopyButtonState(button, false);
         }
 
         document.body.removeChild(textArea);
+    }
+
+    // Add this new function to update the button state
+    function updateCopyButtonState(button, success) {
+        if (success) {
+            const originalText = button.textContent;
+            button.innerHTML = 'Copied <i class="material-icons" style="font-size: 16px; vertical-align: text-bottom;">check</i>';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.disabled = false;
+            }, 10000);
+        } else {
+            button.textContent = 'Failed to copy';
+            setTimeout(() => {
+                button.textContent = 'Copy Link';
+            }, 3000);
+        }
     }
 
     document.getElementById('claim-referral').addEventListener('click', claimReferralCredits);
@@ -590,6 +609,7 @@ try {
                 } catch (error) {
                     console.error('An error occurred in the script:', error);
                 }
+
 
 
 
