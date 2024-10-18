@@ -606,7 +606,144 @@ try {
                         }
                     });
 
+                    // Add this function to your existing <script> tag
+                    function showPopup(message, icon = 'info-circle') {
+                        const overlay = document.getElementById('popup-overlay');
+                        const messageElement = document.getElementById('popup-message');
+                        const iconElement = document.getElementById('popup-icon');
+                        const okButton = document.getElementById('popup-ok-button');
+
+                        messageElement.textContent = message;
+                        iconElement.className = `fas fa-${icon}`;
+
+                        overlay.classList.add('show');
+
+                        okButton.onclick = () => {
+                            overlay.classList.remove('show');
+                        };
+
+                        // Remove the automatic closing timeout
+                    }
+
+                    // Update the existing functions to use the new showPopup
+                    function signUp() {
+                        const name = document.getElementById('signup-name').value;
+                        const email = document.getElementById('signup-email').value;
+                        const password = document.getElementById('signup-password').value;
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const referralCode = urlParams.get('ref');
+
+                        if (!name || !email || !password) {
+                            showPopup('Please fill in all fields.', 'exclamation-circle');
+                            return;
+                        }
+
+                        if (!isValidEmail(email)) {
+                            showPopup('Please enter a valid email address.', 'exclamation-circle');
+                            return;
+                        }
+
+                        fetch('/auth/signup', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name, email, password, referralCode })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                showPopup('Sign up successful! Please check your email for the verification code.', 'check-circle');
+                                localStorage.setItem('tempUserId', data.userId);
+                                toggleForm('verify');
+                            } else {
+                                showPopup(data.message || 'Sign up failed. Please try again.', 'times-circle');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showPopup('An error occurred. Please try again.', 'times-circle');
+                        });
+                    }
+
+                    function verifyEmail() {
+                        clearErrorMessage('verify-error-message');
+                        const verificationCode = document.getElementById('verification-code').value;
+                        const userId = localStorage.getItem('tempUserId');
+
+                        if (!verificationCode) {
+                            showPopup('Please enter the verification code.', 'exclamation-circle');
+                            return;
+                        }
+
+                        fetch('/auth/verify', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ userId, verificationCode })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                showPopup('Email verified successfully. You can now add a profile picture or skip to sign in.', 'check-circle');
+                                toggleForm('profile-picture');
+                            } else {
+                                showPopup(data.message || 'Verification failed. Please try again.', 'times-circle');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showPopup('An error occurred. Please try again.', 'times-circle');
+                        });
+                    }
+
+                    function uploadProfilePicture() {
+                        clearErrorMessage('profile-picture-error-message');
+                        const pictureInput = document.getElementById('profile-picture');
+                        const userId = localStorage.getItem('tempUserId');
+                        const loadingIndicator = document.getElementById('upload-loading');
+
+                        if (!pictureInput.files[0]) {
+                            showPopup('Please select a picture to upload.', 'exclamation-circle');
+                            return;
+                        }
+
+                        if (!userId) {
+                            showPopup('Unable to upload. Please try again or start over.', 'exclamation-circle');
+                            return;
+                        }
+
+                        const formData = new FormData();
+                        formData.append('picture', pictureInput.files[0]);
+                        formData.append('userId', userId);
+
+                        loadingIndicator.style.display = 'block';
+
+                        fetch('/upload-profile-picture', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            loadingIndicator.style.display = 'none';
+                            if (data.success) {
+                                showPopup('Profile picture uploaded successfully. You will now be logged in.', 'check-circle');
+                                autoLogin(userId);
+                            } else {
+                                showPopup(data.message || 'Failed to upload profile picture. Please try again.', 'times-circle');
+                            }
+                        })
+                        .catch(error => {
+                            loadingIndicator.style.display = 'none';
+                            console.error('Error:', error);
+                            showPopup('An error occurred. Please try again.', 'times-circle');
+                        });
+                    }
+
+                    // Update other functions that use alerts or error messages to use showPopup instead
+
                 } catch (error) {
                     console.error('An error occurred in the script:', error);
                 }
+
+
+
+
 
