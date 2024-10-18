@@ -742,8 +742,3 @@ try {
                 } catch (error) {
                     console.error('An error occurred in the script:', error);
                 }
-
-
-
-
-
