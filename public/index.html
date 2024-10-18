@@ -205,6 +205,53 @@
         .delete-preview i {
             color: #ff4444;
         }
+
+        /* Add this to your existing <style> tag or in a separate CSS file */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .popup-content {
+            background-color: var(--container-bg);
+            border-radius: 10px;
+            padding: 20px;
+            width: 90%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .popup-icon {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .popup-content p {
+            color: var(--text-color);
+            margin-bottom: 20px;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .popup-ok-button {
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -221,6 +268,8 @@
             <div class="form-group">
                 <input type="password" id="signup-password" placeholder="Password" required>
             </div>
+            <!-- Add this just above the Register button in the signup form -->
+            <p id="signup-error-message" class="error-message"></p>
             <button onclick="signUp()">Register</button>
             <p class="form-toggle" onclick="toggleForm('signin')">Already have an account? Log In</p>
         </div>
@@ -232,6 +281,8 @@
             <div class="form-group">
                 <input type="password" id="signin-password" placeholder="Password" required>
             </div>
+            <!-- In the signin-form div, add this before the Log In button -->
+            <p id="signin-error-message" class="error-message"></p>
             <button onclick="signIn()">Log In</button>
             <p class="form-toggle" onclick="toggleForm('signup')">Don't have an account? Register</p>
             <p class="forgot-password" onclick="toggleForm('forgot-password')">Forgot Password?</p>
@@ -241,6 +292,8 @@
             <div class="form-group">
                 <input type="text" id="verification-code" placeholder="Verification Code" required>
             </div>
+            <!-- In the verify-form div, add this before the Verify button -->
+            <p id="verify-error-message" class="error-message"></p>
             <button onclick="verifyEmail()">Verify</button>
         </div>
 
@@ -259,6 +312,7 @@
                     <img id="image-preview" class="image-preview" src="" alt="Profile picture preview">
                 </div>
             </div>
+            <p id="profile-picture-error-message" class="error-message"></p>
             <div class="button-group">
                 <button onclick="skipProfilePicture()">Skip</button>
                 <button onclick="uploadProfilePicture()">Continue</button>
@@ -272,6 +326,16 @@
             </div>
             <button onclick="forgotPassword()">Reset Password</button>
             <p class="form-toggle" onclick="toggleForm('signin')">Back to Sign In</p>
+        </div>
+    </div>
+
+    <div id="popup-overlay" class="popup-overlay" style="display: none;">
+        <div class="popup-content">
+            <div class="popup-icon">
+                <i id="popup-icon" class="fas"></i>
+            </div>
+            <p id="popup-message"></p>
+            <button id="popup-ok-button" class="popup-ok-button">OK</button>
         </div>
     </div>
 
@@ -290,6 +354,7 @@
         }
 
         function signUp() {
+            clearErrorMessage('signup-error-message');
             const name = document.getElementById('signup-name').value;
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
@@ -297,12 +362,12 @@
             const referralCode = urlParams.get('ref');
             
             if (!name || !email || !password) {
-                alert('Please fill in all fields.');
+                showPopup('Please fill in all fields.', 'exclamation-circle');
                 return;
             }
             
             if (!isValidEmail(email)) {
-                alert('Please enter a valid email address.');
+                showErrorMessage('Please enter a valid email address.', 'signup-error-message');
                 return;
             }
             
@@ -314,25 +379,26 @@
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    alert('Sign up successful! Please check your email for the verification code.');
+                    showPopup('Sign up successful! Please check your email for the verification code.', 'check-circle');
                     localStorage.setItem('tempUserId', data.userId);
                     toggleForm('verify');
                 } else {
-                    alert(data.message || 'Sign up failed. Please try again.');
+                    showErrorMessage(data.message || 'Sign up failed. Please try again.', 'signup-error-message');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                showErrorMessage('An error occurred. Please try again.', 'signup-error-message');
             });
         }
 
         function verifyEmail() {
+            clearErrorMessage('verify-error-message');
             const verificationCode = document.getElementById('verification-code').value;
             const userId = localStorage.getItem('tempUserId');
             
             if (!verificationCode) {
-                alert('Please enter the verification code.');
+                showErrorMessage('Please enter the verification code.', 'verify-error-message');
                 return;
             }
             
@@ -344,25 +410,31 @@
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    alert('Email verified successfully. You can now add a profile picture or skip to sign in.');
+                    showPopup('Email verified successfully. You can now add a profile picture or skip to sign in.', 'check-circle');
                     toggleForm('profile-picture');
                 } else {
-                    alert(data.message || 'Verification failed. Please try again.');
+                    showErrorMessage(data.message || 'Verification failed. Please try again.', 'verify-error-message');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                showErrorMessage('An error occurred. Please try again.', 'verify-error-message');
             });
         }
 
         function uploadProfilePicture() {
+            clearErrorMessage('profile-picture-error-message');
             const pictureInput = document.getElementById('profile-picture');
             const userId = localStorage.getItem('tempUserId');
             const loadingIndicator = document.getElementById('upload-loading');
             
             if (!pictureInput.files[0]) {
-                alert('Please select a picture to upload.');
+                showErrorMessage('Please select a picture to upload.', 'profile-picture-error-message');
+                return;
+            }
+
+            if (!userId) {
+                showErrorMessage('Unable to upload. Please try again or start over.', 'profile-picture-error-message');
                 return;
             }
 
@@ -380,22 +452,26 @@
             .then(data => {
                 loadingIndicator.style.display = 'none';
                 if (data.success) {
-                    alert('Profile picture uploaded successfully. You will now be logged in.');
+                    showPopup('Profile picture uploaded successfully. You will now be logged in.', 'check-circle');
                     autoLogin(userId);
                 } else {
-                    alert(data.message || 'Failed to upload profile picture. Please try again.');
+                    showErrorMessage(data.message || 'Failed to upload profile picture. Please try again.', 'profile-picture-error-message');
                 }
             })
             .catch(error => {
                 loadingIndicator.style.display = 'none';
                 console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                showErrorMessage('An error occurred. Please try again.', 'profile-picture-error-message');
             });
         }
 
         function skipProfilePicture() {
             const userId = localStorage.getItem('tempUserId');
-            autoLogin(userId);
+            if (userId) {
+                autoLogin(userId);
+            } else {
+                showErrorMessage('Unable to skip. Please try again or start over.', 'profile-picture-error-message');
+            }
         }
 
         function autoLogin(userId) {
@@ -416,28 +492,29 @@
                     window.location.href = '/chat';
                 } else {
                     console.error('Auto-login failed:', data.message);
-                    alert('Failed to log in automatically. Please try signing in manually. Error: ' + data.message);
+                    showErrorMessage('Failed to log in automatically. Please try signing in manually. Error: ' + data.message, 'signup-error-message');
                     toggleForm('signin');
                 }
             })
             .catch(error => {
                 console.error('Error during auto-login:', error);
-                alert('An error occurred during auto-login. Please try signing in manually. Error: ' + error.message);
+                showErrorMessage('An error occurred during auto-login. Please try signing in manually. Error: ' + error.message, 'signup-error-message');
                 toggleForm('signin');
             });
         }
 
         function signIn() {
+            clearErrorMessage('signin-error-message');
             const email = document.getElementById('signin-email').value;
             const password = document.getElementById('signin-password').value;
             
             if (!email || !password) {
-                alert('Please fill in all fields.');
+                showErrorMessage('Please fill in all fields.', 'signin-error-message');
                 return;
             }
             
             if (!isValidEmail(email)) {
-                alert('Please enter a valid email address.');
+                showErrorMessage('Please enter a valid email address.', 'signin-error-message');
                 return;
             }
             
@@ -451,12 +528,12 @@
                 if (data.success) {
                     window.location.href = '/chat';
                 } else {
-                    alert(data.message || 'Sign in failed. Please try again.');
+                    showErrorMessage(data.message || 'Sign in failed. Please try again.', 'signin-error-message');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                showErrorMessage('An error occurred. Please try again.', 'signin-error-message');
             });
         }
 
@@ -464,7 +541,7 @@
             const email = document.getElementById('forgot-password-email').value;
             
             if (!email) {
-                alert('Please enter your email address.');
+                showErrorMessage('Please enter your email address.', 'forgot-password-error-message');
                 return;
             }
             
@@ -476,15 +553,15 @@
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    alert('Password reset email sent. Please check your email.');
+                    showPopup('Password reset email sent. Please check your email.', 'check-circle');
                     toggleForm('signin');
                 } else {
-                    alert(data.message || 'Failed to send password reset email. Please try again.');
+                    showErrorMessage(data.message || 'Failed to send password reset email. Please try again.', 'forgot-password-error-message');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                showErrorMessage('An error occurred. Please try again.', 'forgot-password-error-message');
             });
         }
 
@@ -522,6 +599,60 @@
             document.getElementById('file-name').textContent = 'No file chosen';
             fileInput.value = ''; // Reset file input
         }
+
+        function showPopup(message, icon = 'info-circle') {
+            // Create a new div for the popup
+            const popup = document.createElement('div');
+            popup.style.position = 'fixed';
+            popup.style.left = '50%';
+            popup.style.top = '10%';
+            popup.style.transform = 'translateX(-50%)';
+            popup.style.backgroundColor = 'rgba(4, 32, 55, 0.9)';
+            popup.style.color = '#a0e4ff';
+            popup.style.padding = '15px';
+            popup.style.borderRadius = '10px';
+            popup.style.boxShadow = '0 0 10px rgba(0, 195, 255, 0.5)';
+            popup.style.zIndex = '1000';
+            popup.style.maxWidth = '80%';
+            popup.style.textAlign = 'center';
+
+            // Add the icon and message
+            popup.innerHTML = `
+                <i class="fas fa-${icon}" style="font-size: 24px; color: #00c3ff; margin-bottom: 10px;"></i>
+                <p style="margin: 10px 0;">${message}</p>
+                <button onclick="this.parentElement.remove()" style="background-color: #00c3ff; color: #020b1a; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">OK</button>
+            `;
+
+            // Add the popup to the body
+            document.body.appendChild(popup);
+
+            // Remove the popup after 3 seconds if not closed
+            setTimeout(() => {
+                if (document.body.contains(popup)) {
+                    popup.remove();
+                }
+            }, 3000);
+        }
+
+        function showErrorMessage(message, elementId) {
+            const errorMessage = document.getElementById(elementId);
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        function clearErrorMessage(elementId) {
+            const errorMessage = document.getElementById(elementId);
+            errorMessage.textContent = '';
+            errorMessage.style.display = 'none';
+        }
+
+        // Add event listeners for closing modals
+        document.querySelectorAll('.modal-close').forEach(button => {
+            button.addEventListener('click', () => {
+                const modal = button.closest('.modal-overlay');
+                closeModal(modal.id);
+            });
+        });
     </script>
 </body>
 </html>
