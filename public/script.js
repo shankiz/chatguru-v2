@@ -402,7 +402,7 @@ try {
     document.getElementById('copy-referral-link').addEventListener('click', async () => {
         const referralLink = document.getElementById('referral-link').textContent;
         const copyButton = document.getElementById('copy-referral-link');
-        
+
         // Try to use the new Clipboard API
         if (navigator.clipboard && navigator.clipboard.writeText) {
             try {
@@ -422,12 +422,12 @@ try {
     function fallbackCopyTextToClipboard(text, button) {
         const textArea = document.createElement("textarea");
         textArea.value = text;
-        
+
         // Make the textarea out of viewport
         textArea.style.position = "fixed";
         textArea.style.left = "-999999px";
         textArea.style.top = "-999999px";
-        
+
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
@@ -449,7 +449,7 @@ try {
             const originalText = button.textContent;
             button.innerHTML = 'Copied <i class="material-icons" style="font-size: 16px; vertical-align: text-bottom;">check</i>';
             button.disabled = true;
-            
+
             setTimeout(() => {
                 button.textContent = originalText;
                 button.disabled = false;
@@ -609,10 +609,4 @@ try {
                 } catch (error) {
                     console.error('An error occurred in the script:', error);
                 }
-
-
-
-
-
-
 
