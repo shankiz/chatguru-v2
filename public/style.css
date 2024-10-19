@@ -1624,3 +1624,23 @@ input:checked + .slider {
 .popup-ok-button:hover {
   background-color: var(--button-hover);
 }
+
+.social-login {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.fb-login-button {
+  background-color: #1877f2;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.fb-login-button:hover {
+  background-color: #166fe5;
+}
