@@ -6,6 +6,7 @@
     <title>Chatguru V2</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         :root {
             --primary-color: #00c3ff;
@@ -386,6 +387,59 @@
             margin-bottom: 15px;
             text-align: center;
         }
+
+        .fb-login-button {
+            background-color: #1877f2;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .fb-login-button:hover {
+            background-color: #166fe5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .fb-login-button i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .or-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .or-divider::before,
+        .or-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--text-color);
+            opacity: 0.3;
+        }
+
+        .or-divider span {
+            padding: 0 10px;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        .social-login {
+            margin-top: 30px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -408,6 +462,16 @@
             <p id="signup-error-message" class="error-message"></p>
             <button onclick="signUp()">Register</button>
             <p class="form-toggle" onclick="toggleForm('signin')">Already have an account? Log In</p>
+            
+            <div class="or-divider">
+                <span>OR</span>
+            </div>
+            
+            <div class="social-login">
+                <button onclick="handleFacebookLogin()" class="fb-login-button">
+                    <i class="fab fa-facebook-f"></i> Continue with Facebook
+                </button>
+            </div>
         </div>
 
         <div id="signin-form" style="display: none;">
@@ -422,6 +486,16 @@
             <button onclick="signIn()">Log In</button>
             <p class="form-toggle" onclick="toggleForm('signup')">Don't have an account? Register</p>
             <p class="forgot-password" onclick="toggleForm('forgot-password')">Forgot Password?</p>
+            
+            <div class="or-divider">
+                <span>OR</span>
+            </div>
+            
+            <div class="social-login">
+                <button onclick="handleFacebookLogin()" class="fb-login-button">
+                    <i class="fab fa-facebook-f"></i> Continue with Facebook
+                </button>
+            </div>
         </div>
 
         <div id="verify-form" style="display: none;">
@@ -807,6 +881,74 @@
             // Go back to the signup form
             toggleForm('signup');
         }
+    </script>
+
+    <!-- Update the Facebook SDK script at the bottom of your file -->
+    <script>
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId      : '2297805030575196',
+          cookie     : true,
+          xfbml      : true,
+          version    : 'v12.0'
+        });
+          
+        FB.AppEvents.logPageView();   
+      };
+
+      (function(d, s, id){
+         var js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement(s); js.id = id;
+         js.src = "https://connect.facebook.net/en_US/sdk.js";
+         fjs.parentNode.insertBefore(js, fjs);
+       }(document, 'script', 'facebook-jssdk'));
+
+      function handleFacebookLogin() {
+        FB.login(function(response) {
+          if (response.authResponse) {
+            console.log('Welcome! Fetching your information....');
+            FB.api('/me', {fields: 'name,email,picture.type(large)'}, function(userData) {
+              console.log('Successful login for: ' + userData.name);
+              authenticateWithServer(response.authResponse.accessToken, userData);
+            });
+          } else {
+            console.log('User cancelled login or did not fully authorize.');
+          }
+        }, {scope: 'public_profile,email'});
+      }
+
+      function authenticateWithServer(accessToken, userData) {
+        console.log('Authenticating with server. Access Token:', accessToken, 'User Data:', userData);
+        fetch('/auth/facebook', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            accessToken: accessToken,
+            userData: userData
+          }),
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            console.log('Server authentication successful, redirecting to /chat');
+            // Store the profile picture URL in localStorage
+            if (data.picture) {
+              localStorage.setItem('userProfilePicture', data.picture);
+            }
+            window.location.href = '/chat';
+          } else {
+            console.log('Server authentication failed');
+            showPopup('Facebook login failed. Please try again. Error: ' + (data.message || 'Unknown error'), 'times-circle');
+          }
+        })
+        .catch(error => {
+          console.error('Error during server authentication:', error);
+          showPopup('An error occurred during authentication. Please try again.', 'times-circle');
+        });
+      }
     </script>
 </body>
 </html>
