@@ -116,5 +116,16 @@
     </div>
 
     <script src="script.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const userAvatar = document.getElementById('user-avatar');
+        const profilePicture = localStorage.getItem('userProfilePicture');
+        if (profilePicture) {
+          userAvatar.src = profilePicture;
+        } else {
+          userAvatar.src = 'default-avatar.png'; // Replace with your default avatar image
+        }
+      });
+    </script>
 </body>
 </html>
