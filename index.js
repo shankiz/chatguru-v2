@@ -11,11 +11,16 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const multer = require('multer');
 const fs = require('fs');
+const axios = require('axios');
 
 const app = express();
 
 // Add this near the top of your file, after other imports
 const unverifiedUsers = new Map();
+
+// Add these near the top of your file, after other imports
+const FACEBOOK_APP_ID = '2297805030575196';
+const FACEBOOK_APP_SECRET = 'a23bf86316a2818ac8d0e27e04632de3';
 
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -72,9 +77,12 @@ app.get("/", (req, res) => {
 
 app.get("/chat", (req, res) => {
   console.log("Received request for chat path");
+  console.log("Session:", req.session);
   if (req.session.userId) {
+    console.log("User is authenticated, serving chat.html");
     res.sendFile(path.join(__dirname, 'public', 'chat.html'));
   } else {
+    console.log("User is not authenticated, redirecting to /");
     res.redirect('/');
   }
 });
@@ -442,6 +450,65 @@ app.post("/auth/auto-login", async (req, res) => {
         console.error("Error in /auth/auto-login:", error);
         res.status(500).json({ success: false, message: 'Server error during auto-login', error: error.message });
     }
+});
+
+// Add this new route
+app.post("/auth/facebook", async (req, res) => {
+  const { accessToken, userData } = req.body;
+  console.log('Received Facebook authentication request:', { accessToken, userData });
+
+  try {
+    // Verify the access token
+    const response = await axios.get(`https://graph.facebook.com/debug_token?input_token=${accessToken}&access_token=${FACEBOOK_APP_ID}|${FACEBOOK_APP_SECRET}`);
+    console.log('Token verification response:', response.data);
+    
+    if (response.data.data.is_valid) {
+      console.log('Access token is valid');
+      // Token is valid, check if user exists
+      let user = await db.getUserByEmail(userData.email);
+      
+      if (!user) {
+        console.log('Creating new user');
+        // Create new user
+        const userId = crypto.randomBytes(16).toString('hex');
+        user = await db.createUser(
+          userId,
+          userData.name,
+          userData.email,
+          20, // Initial credits
+          userData.picture.data.url, // Store the profile picture URL
+          null, // No referral code
+          null, // No password for Facebook login
+          null, // No verification token needed
+          true  // User is verified through Facebook
+        );
+      } else {
+        console.log('User already exists');
+        // Update the user's profile picture if it has changed
+        if (user.picture !== userData.picture.data.url) {
+          await db.updateUserProfilePicture(user.userId, userData.picture.data.url);
+          user.picture = userData.picture.data.url;
+        }
+      }
+
+      // Log the user in
+      req.session.userId = user.userId;
+      req.session.save((err) => {
+        if (err) {
+          console.error('Error saving session:', err);
+          return res.status(500).json({ success: false, message: 'Error saving session' });
+        }
+        console.log('User logged in:', user.userId);
+        res.json({ success: true, userId: user.userId, picture: user.picture });
+      });
+    } else {
+      console.log('Invalid access token');
+      res.status(400).json({ success: false, message: 'Invalid Facebook access token' });
+    }
+  } catch (error) {
+    console.error('Error in Facebook authentication:', error);
+    res.status(500).json({ success: false, message: 'Server error during Facebook authentication', error: error.message });
+  }
 });
 
 // Add this error handling middleware at the end of your file, just before app.listen()
