@@ -2,953 +2,817 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatguru V2</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AI Anime Voice</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #00c3ff;
-            --bg-color: #020b1a;
-            --text-color: #a0e4ff;
-            --container-bg: rgba(4, 32, 55, 0.8);
-            --input-bg: rgba(255, 255, 255, 0.05);
-            --button-hover: #00a0cc;
-        }
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-tap-highlight-color: transparent;
         }
+
+        :root {
+            --primary: #7C3AED;
+            --primary-light: #8B5CF6;
+            --dark: #1F2937;
+            --darker: #111827;
+            --light: #F3F4F6;
+            --background: var(--darker);
+            --text: var(--light);
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            margin: 0;
+            padding: 0;
+            background: var(--darker);
+            color: var(--text);
             min-height: 100vh;
-            padding: 20px;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(6, 124, 250, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(6, 124, 250, 0.1) 0%, transparent 20%);
-            background-attachment: fixed;
+            min-height: -webkit-fill-available;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            padding: env(safe-area-inset-top, 12px) 0 env(safe-area-inset-bottom, 12px);
         }
-        .container {
+
+        html {
+            height: -webkit-fill-available;
+        }
+
+        main {
+            flex: 1;
+            padding: 20px 24px;
+            max-width: 420px;
+            margin: 0 auto;
             width: 100%;
-            max-width: 400px;
-            background-color: var(--container-bg);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 0 30px rgba(0, 195, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            justify-content: center;
+            min-height: 600px;
+        }
+
+        .app-header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding-top: 0;
+        }
+
+        .app-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from {
+                filter: drop-shadow(0 0 2px rgba(124, 58, 237, 0.3));
+            }
+            to {
+                filter: drop-shadow(0 0 6px rgba(124, 58, 237, 0.6));
+            }
+        }
+
+        .app-subtitle {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 0;
+            font-weight: 400;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 400;
+            transition: all 0.2s ease;
             backdrop-filter: blur(10px);
         }
-        h1 {
-            color: var(--primary-color);
-            font-size: 2.2em;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            flex-grow: 1;
-            margin: 0;
-            padding-left: 0; /* Remove the padding for the back icon */
-        }
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-        input {
-            width: 100%;
-            padding: 12px 15px;
-            border: none;
-            border-radius: 8px;
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-        input:focus {
+
+        .form-group input:focus {
             outline: none;
-            box-shadow: 0 0 0 2px var(--primary-color);
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
         }
-        button {
+
+        .auth-button {
             width: 100%;
             padding: 12px;
+            background: var(--primary);
             border: none;
-            border-radius: 8px;
-            background-color: var(--primary-color);
-            color: var(--bg-color);
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-        }
-        button:hover {
-            background-color: var(--button-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 195, 255, 0.3);
-        }
-        .form-toggle, .forgot-password {
-            margin-top: 15px;
-            color: var(--text-color);
-            cursor: pointer;
-            text-align: center;
-            font-size: 14px;
-            transition: color 0.3s ease;
-        }
-        .form-toggle:hover, .forgot-password:hover {
-            color: var(--primary-color);
-        }
-        #profile-picture-form {
-            text-align: center;
-        }
-        #profile-picture-form h2 {
-            margin-bottom: 20px;
-            font-size: 1.5em;
-            color: var(--primary-color);
-        }
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            cursor: pointer;
-        }
-        .file-input-wrapper input[type=file] {
-            font-size: 100px;
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-        .file-input-wrapper .btn {
-            display: inline-block;
-            padding: 8px 20px;
-            background-color: var(--primary-color);
-            color: var(--bg-color);
-            border-radius: 5px;
-            transition: all 0.3s ease;
-        }
-        .file-input-wrapper:hover .btn {
-            background-color: var(--button-hover);
-        }
-        .file-name {
-            margin-top: 10px;
-            font-size: 14px;
-        }
-        .button-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            margin-top: 10px;
-        }
-        
-        .loading::after {
-            content: '';
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--primary-color);
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            to {transform: rotate(360deg);}
-        }
-        
-        .image-preview-container {
-            width: 200px;
-            margin: 20px auto;
-            position: relative;
-            display: none;
-        }
-        
-        .image-preview-wrapper {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            overflow: hidden;
-        }
-        
-        .image-preview {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .delete-preview {
-            position: absolute;
-            top: -20px;
-            right: 0;
-            background-color: rgba(255, 255, 255, 0.7);
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .delete-preview:hover {
-            background-color: rgba(255, 255, 255, 0.9);
-        }
-
-        .delete-preview i {
-            color: #ff4444;
-        }
-
-        .popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-        }
-
-        .popup-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .popup-content {
-            background-color: var(--container-bg);
-            border-radius: 8px;
-            padding: 15px;
-            width: 90%;
-            max-width: 250px;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 0 10px rgba(0, 195, 255, 0.3);
-        }
-
-        .popup-icon {
-            font-size: 36px;
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-
-        .popup-content p {
-            color: var(--text-color);
-            margin-bottom: 15px;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .popup-ok-button {
-            background-color: var(--primary-color);
-            color: var(--bg-color);
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            width: 100%;
-        }
-
-        .popup-ok-button:hover {
-            background-color: var(--button-hover);
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px;
-            }
-            h1 {
-                font-size: 1.8em;
-                margin-bottom: 20px;
-            }
-            input, button {
-                font-size: 14px;
-            }
-            .form-group {
-                margin-bottom: 15px;
-            }
-        }
-
-        .loader {
-            display: none;
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--primary-color);
-            border-top: 4px solid transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        .verify-form-container {
-            position: relative;
-        }
-
-        .back-icon {
-            display: none;
-        }
-
-        .title-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 25px;
-        }
-
-        .signup-email {
-            text-align: left;
-            margin-bottom: 15px;
-            font-size: 14px;
-            color: var(--text-color);
-        }
-
-        .resend-code {
-            text-align: left;
-            margin-top: 10px;
-            font-size: 14px;
-            color: var(--text-color);
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .resend-code:hover {
-            color: var(--primary-color);
-        }
-
-        .verify-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .title-container {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            margin-bottom: 25px;
-            position: relative;
-        }
-
-        .title-icon {
-            font-size: 1.8em;
-            margin-right: 10px;
-            color: var(--primary-color);
-        }
-
-        .verify-actions {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .resend-code {
-            margin-top: 10px;
-            font-size: 14px;
-            color: var(--text-color);
-            cursor: pointer;
-            transition: color 0.3s ease;
-            text-align: left;
-        }
-
-        .resend-code:hover {
-            color: var(--primary-color);
-        }
-
-        .tagline-note {
-            font-size: 12px;
-            color: var(--text-color);
-            opacity: 0.8;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .fb-login-button {
-            background-color: #1877f2;
+            border-radius: 12px;
             color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            margin-bottom: 12px;
         }
 
-        .fb-login-button:hover {
-            background-color: #166fe5;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        .auth-button:hover {
+            background: var(--primary-light);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
         }
 
-        .fb-login-button i {
-            margin-right: 10px;
-            font-size: 20px;
+        .auth-button:active {
+            transform: translateY(0);
+        }
+
+        .form-toggle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            margin-bottom: 16px;
+            transition: color 0.2s ease;
+        }
+
+        .form-toggle:hover {
+            color: var(--text);
         }
 
         .or-divider {
-            display: flex;
-            align-items: center;
             text-align: center;
-            margin: 20px 0;
+            position: relative;
+            margin: 16px 0;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
         }
 
         .or-divider::before,
         .or-divider::after {
             content: '';
-            flex: 1;
-            border-bottom: 1px solid var(--text-color);
-            opacity: 0.3;
+            position: absolute;
+            top: 50%;
+            width: calc(50% - 30px);
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        .or-divider span {
-            padding: 0 10px;
-            color: var(--text-color);
-            font-size: 14px;
+        .or-divider::before {
+            left: 0;
+        }
+
+        .or-divider::after {
+            right: 0;
         }
 
         .social-login {
-            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .facebook-btn,
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .facebook-btn {
+            background: #1877F2;
+            color: white;
+        }
+
+        .google-btn {
+            background: white;
+            color: #333;
+        }
+
+        .facebook-btn:hover,
+        .google-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .terms-text {
             text-align: center;
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin: 16px 0;
+            line-height: 1.6;
+            padding: 0 20px;
+        }
+
+        .terms-text a {
+            color: var(--primary-light);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .terms-text a:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(17, 24, 39, 0.9);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading::after {
+            content: '';
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--text);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(17, 24, 39, 0.9);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .popup-content {
+            background: var(--dark);
+            padding: 24px;
+            border-radius: 20px;
+            text-align: center;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .popup-icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+            color: var(--primary);
+        }
+
+        .popup-message {
+            margin-bottom: 20px;
+            color: var(--text);
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .popup-button {
+            padding: 14px 28px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .popup-button:active {
+            transform: scale(0.98);
+            background: var(--primary-light);
+        }
+
+        .form {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .form.active {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #verificationForm {
+            text-align: center;
+        }
+
+        .verification-icon {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .verification-code {
+            width: 100%;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 28px;
+            font-weight: 500;
+            text-align: center;
+            letter-spacing: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .verification-code:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .verification-code::placeholder {
+            letter-spacing: 0;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .verification-text {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .verification-email {
+            color: var(--text);
+            font-weight: 500;
+            word-break: break-all;
+            display: block;
+            margin-top: 8px;
+            padding: 0 20px;
+        }
+
+        @media (max-height: 720px) {
+            .verification-code {
+                padding: 16px;
+                font-size: 24px;
+            }
+
+            .verification-text {
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+
+            .verification-icon {
+                font-size: 40px;
+                margin-bottom: 12px;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .verification-code {
+                padding: 12px;
+                font-size: 20px;
+            }
+
+            .verification-text {
+                font-size: 13px;
+                margin-bottom: 16px;
+            }
+
+            .verification-icon {
+                font-size: 32px;
+                margin-bottom: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            main {
+                padding: 20px 16px;
+            }
+
+            .app-header {
+                margin-bottom: 32px;
+            }
+
+            .app-title {
+                font-size: 24px;
+            }
+
+            .form-group input,
+            .auth-button,
+            .facebook-btn,
+            .google-btn {
+                padding: 14px;
+            }
+        }
+
+        @supports (-webkit-touch-callout: none) {
+            body {
+                min-height: -webkit-fill-available;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="title-container">
-            <h1>Chatguru V2</h1>
-        </div>
-        
-        <div id="signup-form">
-            <div class="form-group">
-                <input type="text" id="signup-name" placeholder="Full Name" required>
-            </div>
-            <div class="form-group">
-                <input type="email" id="signup-email" placeholder="Email" required>
-            </div>
-            <div class="form-group">
-                <input type="password" id="signup-password" placeholder="Password" required>
-            </div>
-            <!-- Add this just above the Register button in the signup form -->
-            <p id="signup-error-message" class="error-message"></p>
-            <button onclick="signUp()">Register</button>
-            <p class="form-toggle" onclick="toggleForm('signin')">Already have an account? Log In</p>
-            
-            <div class="or-divider">
-                <span>OR</span>
-            </div>
-            
-            <div class="social-login">
-                <button onclick="handleFacebookLogin()" class="fb-login-button">
-                    <i class="fab fa-facebook-f"></i> Continue with Facebook
-                </button>
-            </div>
-        </div>
+    <div class="loading" id="loading"></div>
 
-        <div id="signin-form" style="display: none;">
-            <div class="form-group">
-                <input type="email" id="signin-email" placeholder="Email" required>
-            </div>
-            <div class="form-group">
-                <input type="password" id="signin-password" placeholder="Password" required>
-            </div>
-            <!-- In the signin-form div, add this before the Log In button -->
-            <p id="signin-error-message" class="error-message"></p>
-            <button onclick="signIn()">Log In</button>
-            <p class="form-toggle" onclick="toggleForm('signup')">Don't have an account? Register</p>
-            <p class="forgot-password" onclick="toggleForm('forgot-password')">Forgot Password?</p>
-            
-            <div class="or-divider">
-                <span>OR</span>
-            </div>
-            
-            <div class="social-login">
-                <button onclick="handleFacebookLogin()" class="fb-login-button">
-                    <i class="fab fa-facebook-f"></i> Continue with Facebook
-                </button>
-            </div>
-        </div>
-
-        <div id="verify-form" style="display: none;">
-            <div class="verify-form-container">
-                <p class="signup-email" id="signup-email-display"></p>
-                <div class="form-group">
-                    <input type="text" id="verification-code" placeholder="Verification Code" required>
-                </div>
-                <p id="verify-error-message" class="error-message"></p>
-                <div class="verify-actions">
-                    <button onclick="verifyEmail()">Verify</button>
-                    <p class="resend-code" onclick="resendVerificationCode()">Didn't get the code? Please try again</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="profile-picture-form" style="display: none;">
-            <h2>Add a Profile Picture</h2>
-            <p class="tagline-note">Note: You can't change this later</p>
-            <div class="file-input-wrapper">
-                <button class="btn">Choose File</button>
-                <input type="file" id="profile-picture" accept="image/*" onchange="previewImage(this)">
-            </div>
-            <p class="file-name" id="file-name"></p>
-            <div class="image-preview-container" id="image-preview-container">
-                <div class="delete-preview" onclick="deletePreview()">
-                    <i class="fas fa-trash"></i>
-                </div>
-                <div class="image-preview-wrapper">
-                    <img id="image-preview" class="image-preview" src="" alt="Profile picture preview">
-                </div>
-            </div>
-            <p id="profile-picture-error-message" class="error-message"></p>
-            <div class="button-group">
-                <button onclick="skipProfilePicture()">Skip</button>
-                <button onclick="uploadProfilePicture()">Continue</button>
-            </div>
-            <div class="loading" id="upload-loading"></div>
-        </div>
-
-        <div id="forgot-password-form" style="display: none;">
-            <div class="form-group">
-                <input type="email" id="forgot-password-email" placeholder="Email" required>
-            </div>
-            <button onclick="forgotPassword()">Reset Password</button>
-            <p class="form-toggle" onclick="toggleForm('signin')">Back to Sign In</p>
-        </div>
-    </div>
-
-    <div class="popup-overlay" id="popup-overlay">
+    <div class="popup" id="popup">
         <div class="popup-content">
-            <div class="popup-icon">
-                <i id="popup-icon" class="fas"></i>
-            </div>
-            <p id="popup-message"></p>
-            <button id="popup-ok-button" class="popup-ok-button">OK</button>
+            <i class="popup-icon" id="popup-icon"></i>
+            <div class="popup-message" id="popup-message"></div>
+            <button class="popup-button" id="popup-ok">OK</button>
         </div>
     </div>
 
-    <div id="loader" class="loader"></div>
+    <main>
+        <div class="app-header">
+            <h1 class="app-title">AI Anime Voice</h1>
+            <h2 class="app-subtitle" id="auth-subtitle">Login to use AI Anime Voice</h2>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="form">
+            <div class="form-group">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="auth-button">Sign In</button>
+            <p class="form-toggle" onclick="toggleForm('signupForm')">Don't have an account? Sign Up</p>
+            
+            <div class="or-divider">OR</div>
+            
+            <div class="social-login">
+                <button type="button" class="facebook-btn">
+                    <i class="fab fa-facebook-f"></i>
+                    Continue with Facebook
+                </button>
+                <button type="button" class="google-btn">
+                    <i class="fab fa-google"></i>
+                    Continue with Google
+                </button>
+            </div>
+        </form>
+
+        <!-- Signup Form -->
+        <form id="signupForm" class="form">
+            <div class="form-group">
+                <label for="signupName">Full Name</label>
+                <input type="text" id="signupName" placeholder="Enter your full name" required>
+            </div>
+            <div class="form-group">
+                <label for="signupEmail">Email</label>
+                <input type="email" id="signupEmail" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="signupPassword">Password</label>
+                <input type="password" id="signupPassword" placeholder="Create a password" required>
+            </div>
+            <button type="submit" class="auth-button">Sign Up</button>
+            <p class="form-toggle" onclick="toggleForm('loginForm')">Already have an account? Sign In</p>
+            
+            <p class="terms-text">
+                By signing up, you agree to our <a href="/terms.html">Terms of Service</a>, <a href="/privacy.html">Privacy Policy</a>, and <a href="/refund.html">Refund Policy</a>
+            </p>
+            
+            <div class="or-divider">OR</div>
+            
+            <div class="social-login">
+                <button type="button" class="facebook-btn">
+                    <i class="fab fa-facebook-f"></i>
+                    Continue with Facebook
+                </button>
+                <button type="button" class="google-btn">
+                    <i class="fab fa-google"></i>
+                    Continue with Google
+                </button>
+            </div>
+        </form>
+
+        <!-- Verification Form -->
+        <form id="verificationForm" class="form">
+            <i class="fas fa-envelope-circle-check verification-icon"></i>
+            <p class="verification-text">
+                Please enter the verification code sent to:
+                <span class="verification-email" id="verificationEmail"></span>
+            </p>
+            <div class="form-group">
+                <input type="text" id="verificationCode" class="verification-code" maxlength="6" placeholder="Enter code" required>
+            </div>
+            <button type="submit" class="auth-button">Verify Email</button>
+            <p class="form-toggle" onclick="toggleForm('signupForm')">Didn't receive the code? Try again</p>
+        </form>
+
+    </main>
 
     <script>
-        function toggleForm(formType) {
-            document.getElementById('signin-form').style.display = formType === 'signin' ? 'block' : 'none';
-            document.getElementById('signup-form').style.display = formType === 'signup' ? 'block' : 'none';
-            document.getElementById('verify-form').style.display = formType === 'verify' ? 'block' : 'none';
-            document.getElementById('profile-picture-form').style.display = formType === 'profile-picture' ? 'block' : 'none';
-            document.getElementById('forgot-password-form').style.display = formType === 'forgot-password' ? 'block' : 'none';
-            
-            if (formType === 'verify') {
-                const email = localStorage.getItem('signupEmail');
-                document.getElementById('signup-email-display').textContent = email || 'Email not found';
-            }
+        // Utility functions
+        function showLoading() {
+            document.getElementById('loading').style.display = 'flex';
         }
 
-        function updateFileName(input) {
-            const fileName = input.files[0] ? input.files[0].name : 'No file chosen';
-            document.getElementById('file-name').textContent = fileName;
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
         }
 
-        function showLoader() {
-            document.getElementById('loader').style.display = 'block';
-        }
-
-        function hideLoader() {
-            document.getElementById('loader').style.display = 'none';
-        }
-
-        function signUp() {
-            clearErrorMessage('signup-error-message');
-            const name = document.getElementById('signup-name').value;
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
-            const urlParams = new URLSearchParams(window.location.search);
-            const referralCode = urlParams.get('ref');
+        function showPopup(message, type = 'info', callback = null) {
+            const popup = document.getElementById('popup');
+            const popupMessage = document.getElementById('popup-message');
+            const popupIcon = document.getElementById('popup-icon');
             
-            if (!name || !email || !password) {
-                showPopup('Please fill in all fields.', 'exclamation-circle');
-                return;
-            }
-            
-            if (!isValidEmail(email)) {
-                showErrorMessage('Please enter a valid email address.', 'signup-error-message');
-                return;
-            }
-            
-            showLoader(); // Show loader before making the request
-            
-            fetch('/auth/signup', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password, referralCode })
-            })
-            .then(res => res.json())
-            .then(data => {
-                hideLoader(); // Hide loader before showing the popup
-                if (data.success) {
-                    showPopup('Please check your email for the verification code.', 'envelope');
-                    localStorage.setItem('tempUserId', data.userId);
-                    localStorage.setItem('signupEmail', email); // Store the email
-                    toggleForm('verify');
-                } else {
-                    showErrorMessage(data.message || 'Sign up failed. Please try again.', 'signup-error-message');
-                }
-            })
-            .catch(error => {
-                hideLoader(); // Hide loader in case of an error
-                console.error('Error:', error);
-                showErrorMessage('An error occurred. Please try again.', 'signup-error-message');
-            });
-        }
-
-        function verifyEmail() {
-            clearErrorMessage('verify-error-message');
-            const verificationCode = document.getElementById('verification-code').value;
-            const userId = localStorage.getItem('tempUserId');
-            
-            if (!verificationCode) {
-                showPopup('Please enter the verification code.', 'exclamation-circle');
-                return;
-            }
-            
-            fetch('/auth/verify', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, verificationCode })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    showPopup('Email verified successfully. You can now add a profile picture or skip to sign in.', 'check-circle');
-                    toggleForm('profile-picture');
-                } else {
-                    showPopup(data.message || 'Verification failed. Please try again.', 'times-circle');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showPopup('An error occurred. Please try again.', 'times-circle');
-            });
-        }
-
-        function uploadProfilePicture() {
-            clearErrorMessage('profile-picture-error-message');
-            const pictureInput = document.getElementById('profile-picture');
-            const userId = localStorage.getItem('tempUserId');
-            const loadingIndicator = document.getElementById('upload-loading');
-            
-            if (!pictureInput.files[0]) {
-                showPopup('Select a picture to continue.', 'exclamation-circle');
-                return;
-            }
-
-            if (!userId) {
-                showPopup('Unable to upload. Please try again or start over.', 'exclamation-circle');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('picture', pictureInput.files[0]);
-            formData.append('userId', userId);
-
-            loadingIndicator.style.display = 'block';
-
-            fetch('/upload-profile-picture', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                loadingIndicator.style.display = 'none';
-                if (data.success) {
-                    // Remove the popup message and directly proceed to auto-login
-                    autoLogin(userId);
-                } else {
-                    showPopup(data.message || 'Failed to upload profile picture. Please try again.', 'times-circle');
-                }
-            })
-            .catch(error => {
-                loadingIndicator.style.display = 'none';
-                console.error('Error:', error);
-                showPopup('An error occurred. Please try again.', 'times-circle');
-            });
-        }
-
-        function skipProfilePicture() {
-            const userId = localStorage.getItem('tempUserId');
-            if (userId) {
-                autoLogin(userId);
+            if (type === 'success') {
+                popupIcon.className = 'fas fa-check-circle';
+                popupIcon.style.color = '#4CAF50';
+            } else if (type === 'error') {
+                popupIcon.className = 'fas fa-times-circle';
+                popupIcon.style.color = '#f44336';
             } else {
-                showPopup('Unable to skip. Please try again or start over.', 'exclamation-circle');
-            }
-        }
-
-        function autoLogin(userId) {
-            console.log('Attempting auto-login for userId:', userId);
-            fetch('/auth/auto-login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId })
-            })
-            .then(res => {
-                console.log('Auto-login response status:', res.status);
-                return res.json();
-            })
-            .then(data => {
-                console.log('Auto-login response data:', data);
-                if (data.success) {
-                    localStorage.removeItem('tempUserId');
-                    window.location.href = '/chat';
-                } else {
-                    console.error('Auto-login failed:', data.message);
-                    showPopup('Failed to log in automatically. Please try signing in manually. Error: ' + data.message, 'exclamation-circle');
-                    toggleForm('signin');
-                }
-            })
-            .catch(error => {
-                console.error('Error during auto-login:', error);
-                showPopup('An error occurred during auto-login. Please try signing in manually. Error: ' + error.message, 'exclamation-circle');
-                toggleForm('signin');
-            });
-        }
-
-        function signIn() {
-            clearErrorMessage('signin-error-message');
-            const email = document.getElementById('signin-email').value;
-            const password = document.getElementById('signin-password').value;
-            
-            if (!email || !password) {
-                showPopup('Please fill in all fields.', 'exclamation-circle');
-                return;
+                popupIcon.className = 'fas fa-info-circle';
+                popupIcon.style.color = '#2196F3';
             }
             
-            if (!isValidEmail(email)) {
-                showPopup('Please enter a valid email address.', 'exclamation-circle');
-                return;
-            }
+            popupMessage.textContent = message;
+            popup.style.display = 'flex';
             
-            fetch('/auth/signin', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = '/chat';
-                } else {
-                    showPopup(data.message || 'Sign in failed. Please try again.', 'times-circle');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showPopup('An error occurred. Please try again.', 'times-circle');
-            });
-        }
-
-        function forgotPassword() {
-            const email = document.getElementById('forgot-password-email').value;
-            
-            if (!email) {
-                showErrorMessage('Please enter your email address.', 'forgot-password-error-message');
-                return;
-            }
-            
-            fetch('/auth/forgot-password', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    showPopup('Password reset email sent. Please check your email.', 'check-circle');
-                    toggleForm('signin');
-                } else {
-                    showErrorMessage(data.message || 'Failed to send password reset email. Please try again.', 'forgot-password-error-message');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showErrorMessage('An error occurred. Please try again.', 'forgot-password-error-message');
-            });
-        }
-
-        function isValidEmail(email) {
-            const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            return re.test(String(email).toLowerCase());
-        }
-
-        function previewImage(input) {
-            const preview = document.getElementById('image-preview');
-            const previewContainer = document.getElementById('image-preview-container');
-            const file = input.files[0];
-            const reader = new FileReader();
-
-            reader.onloadend = function () {
-                preview.src = reader.result;
-                previewContainer.style.display = 'block';
-            }
-
-            if (file) {
-                reader.readAsDataURL(file);
-                document.getElementById('file-name').textContent = file.name;
-            } else {
-                deletePreview();
-            }
-        }
-
-        function deletePreview() {
-            const preview = document.getElementById('image-preview');
-            const previewContainer = document.getElementById('image-preview-container');
-            const fileInput = document.getElementById('profile-picture');
-            
-            preview.src = "";
-            previewContainer.style.display = 'none';
-            document.getElementById('file-name').textContent = 'No file chosen';
-            fileInput.value = ''; // Reset file input
-        }
-
-        function showPopup(message, icon = 'info-circle') {
-            hideLoader(); // Ensure loader is hidden when showing popup
-            const overlay = document.getElementById('popup-overlay');
-            const messageElement = document.getElementById('popup-message');
-            const iconElement = document.getElementById('popup-icon');
-            const okButton = document.getElementById('popup-ok-button');
-
-            messageElement.textContent = message;
-            iconElement.className = `fas fa-${icon}`;
-
-            overlay.classList.add('show');
-
-            okButton.onclick = () => {
-                overlay.classList.remove('show');
+            const okButton = document.getElementById('popup-ok');
+            okButton.onclick = function() {
+                popup.style.display = 'none';
+                if (callback) callback();
             };
         }
 
-        function showErrorMessage(message, elementId) {
-            const errorMessage = document.getElementById(elementId);
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-        }
-
-        function clearErrorMessage(elementId) {
-            const errorMessage = document.getElementById(elementId);
-            errorMessage.textContent = '';
-            errorMessage.style.display = 'none';
-        }
-
-        // Add event listeners for closing modals
-        document.querySelectorAll('.modal-close').forEach(button => {
-            button.addEventListener('click', () => {
-                const modal = button.closest('.modal-overlay');
-                closeModal(modal.id);
+        function toggleForm(formId) {
+            const forms = ['loginForm', 'signupForm', 'verificationForm'];
+            const subtitle = document.getElementById('auth-subtitle');
+            const appTitle = document.querySelector('.app-title');
+            
+            forms.forEach(id => {
+                const form = document.getElementById(id);
+                if (id === formId) {
+                    form.classList.add('active');
+                    if (id === 'loginForm') {
+                        subtitle.textContent = 'Login to use AI Anime Voice';
+                        appTitle.style.display = 'block';
+                        subtitle.style.display = 'block';
+                    } else if (id === 'signupForm') {
+                        subtitle.textContent = 'Sign up to use AI Anime Voice';
+                        appTitle.style.display = 'block';
+                        subtitle.style.display = 'block';
+                    } else if (id === 'verificationForm') {
+                        appTitle.style.display = 'none';
+                        subtitle.style.display = 'none';
+                    }
+                } else {
+                    form.classList.remove('active');
+                }
             });
-        });
-
-        function resendVerificationCode() {
-            // Clear any stored temporary data
-            localStorage.removeItem('tempUserId');
-            localStorage.removeItem('signupEmail');
-
-            // Go back to the signup form
-            toggleForm('signup');
         }
-    </script>
 
-    <!-- Update the Facebook SDK script at the bottom of your file -->
-    <script>
-      window.fbAsyncInit = function() {
-        FB.init({
-          appId      : '2297805030575196',
-          cookie     : true,
-          xfbml      : true,
-          version    : 'v12.0'
-        });
-          
-        FB.AppEvents.logPageView();   
-      };
+        function validatePassword(password) {
+            return password.length >= 6;
+        }
 
-      (function(d, s, id){
-         var js, fjs = d.getElementsByTagName(s)[0];
-         if (d.getElementById(id)) {return;}
-         js = d.createElement(s); js.id = id;
-         js.src = "https://connect.facebook.net/en_US/sdk.js";
-         fjs.parentNode.insertBefore(js, fjs);
-       }(document, 'script', 'facebook-jssdk'));
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
 
-      function handleFacebookLogin() {
-        FB.login(function(response) {
-          if (response.authResponse) {
-            console.log('Welcome! Fetching your information....');
-            FB.api('/me', {fields: 'name,email,picture.type(large)'}, function(userData) {
-              console.log('Successful login for: ' + userData.name);
-              authenticateWithServer(response.authResponse.accessToken, userData);
-            });
-          } else {
-            console.log('User cancelled login or did not fully authorize.');
-          }
-        }, {scope: 'public_profile,email'});
-      }
+        function validateName(name) {
+            return name.trim().length >= 2;
+        }
 
-      function authenticateWithServer(accessToken, userData) {
-        console.log('Authenticating with server. Access Token:', accessToken, 'User Data:', userData);
-        fetch('/auth/facebook', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            accessToken: accessToken,
-            userData: userData
-          }),
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            console.log('Server authentication successful, redirecting to /chat');
-            // Store the profile picture URL in localStorage
-            if (data.picture) {
-              localStorage.setItem('userProfilePicture', data.picture);
+        async function signUp(event) {
+            event.preventDefault();
+            showLoading();
+
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            
+            // Get referral code from URL if present
+            const urlParams = new URLSearchParams(window.location.search);
+            const referralCode = urlParams.get('ref');
+
+            try {
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        name, 
+                        email, 
+                        password,
+                        referralCode // Include referral code if present
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Store email for verification
+                    localStorage.setItem('verificationEmail', email);
+                    // Display the email in the verification form
+                    document.getElementById('verificationEmail').textContent = email;
+                    toggleForm('verificationForm');
+                    showPopup('Verification code sent to your email!', 'success');
+                } else {
+                    showPopup(data.message || 'Signup failed. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                showPopup('An error occurred. Please try again.', 'error');
+            } finally {
+                hideLoading();
             }
-            window.location.href = '/chat';
-          } else {
-            console.log('Server authentication failed');
-            showPopup('Facebook login failed. Please try again. Error: ' + (data.message || 'Unknown error'), 'times-circle');
-          }
-        })
-        .catch(error => {
-          console.error('Error during server authentication:', error);
-          showPopup('An error occurred during authentication. Please try again.', 'times-circle');
+        }
+
+        async function verifyEmail(event) {
+            event.preventDefault();
+            showLoading();
+
+            const code = document.getElementById('verificationCode').value;
+            const email = localStorage.getItem('verificationEmail');
+
+            try {
+                const response = await fetch('/api/auth/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, code })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showPopup('Email verified successfully!', 'success');
+                    localStorage.removeItem('verificationEmail');
+                    
+                    // Auto login after successful verification
+                    if (data.user) {
+                        // Store user data in session
+                        sessionStorage.setItem('user', JSON.stringify(data.user));
+                        // Redirect to home page
+                        window.location.href = '/home.html';
+                    }
+                } else {
+                    showPopup(data.message || 'Verification failed. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Verification error:', error);
+                showPopup('An error occurred. Please try again.', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Login failed');
+                }
+
+                // Redirect on successful login
+                window.location.href = '/home.html';
+            } catch (error) {
+                console.error('Login error:', error);
+                alert(error.message || 'Failed to login. Please try again.');
+            }
+        }
+
+        // Check if user is already logged in
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth/me', {
+                    credentials: 'include' // Important for session cookies
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/home.html';
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+            }
+        }
+
+        // Check auth status when page loads
+        document.addEventListener('DOMContentLoaded', checkAuth);
+
+        // Initialize forms
+        document.getElementById('signupForm').addEventListener('submit', signUp);
+        document.getElementById('loginForm').addEventListener('submit', handleLogin);
+        document.getElementById('verificationForm').addEventListener('submit', verifyEmail);
+
+        // Format verification code input
+        const verificationCodeInput = document.getElementById('verificationCode');
+        verificationCodeInput.addEventListener('input', function(e) {
+            // Remove non-digits
+            let value = this.value.replace(/\D/g, '');
+            
+            // Limit to 6 digits
+            if (value.length > 6) {
+                value = value.slice(0, 6);
+            }
+            
+            this.value = value;
         });
-      }
+
+        // Only allow numeric input
+        verificationCodeInput.addEventListener('keypress', function(e) {
+            if (!/[\d]/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        // Initialize social login buttons
+        document.querySelectorAll('.facebook-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                showPopup('Facebook login coming soon!', 'info');
+            });
+        });
+
+        document.querySelectorAll('.google-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                showPopup('Google login coming soon!', 'info');
+            });
+        });
+
+        // Check if we need to show a specific form based on URL parameters
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const formType = urlParams.get('form');
+            
+            if (formType === 'signup') {
+                toggleForm('signupForm');
+            } else if (formType === 'verify') {
+                toggleForm('verificationForm');
+            } else {
+                toggleForm('loginForm'); // Default to login form
+            }
+        });
     </script>
 </body>
 </html>
